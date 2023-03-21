@@ -1,13 +1,22 @@
 package nl.tudelft.instrumentation.patching;
+import org.checkerframework.checker.units.qual.A;
+
+import java.lang.reflect.Array;
 import java.util.*;
+
+import static java.util.Collections.frequency;
 
 public class PatchingLab {
 
         static Random r = new Random();
         static boolean isFinished = false;
 
+        static HashMap<String, HashSet<Integer>> opsMap;
+
+
         static void initialize(){
                 // initialize the population based on OperatorTracker.operators
+                opsMap = new HashMap<>();
         }
 
         // encounteredOperator gets called for each operator encountered while running tests
@@ -15,6 +24,11 @@ public class PatchingLab {
                 // Do something useful
 
                 String replacement = OperatorTracker.operators[operator_nr];
+
+                opsMap.computeIfAbsent(replacement, k -> new HashSet<>());
+                opsMap.get(replacement).add(OperatorTracker.current_test); // the
+
+
                 if(replacement.equals("!=")) return left != right;
                 if(replacement.equals("==")) return left == right;
                 if(replacement.equals("<")) return left < right;
@@ -26,11 +40,30 @@ public class PatchingLab {
 
         static boolean encounteredOperator(String operator, boolean left, boolean right, int operator_nr){
                 // Do something useful
-
                 String replacement = OperatorTracker.operators[operator_nr];
+
+                opsMap.computeIfAbsent(replacement, k -> new HashSet<>());
+                opsMap.get(replacement).add(OperatorTracker.current_test);
+
                 if(replacement.equals("!=")) return left != right;
                 if(replacement.equals("==")) return left == right;
                 return false;
+        }
+
+        static double getFitness(List<Boolean> tests){
+                return frequency(tests, true)/(double)tests.size();
+        }
+
+        static double tarantulaScore(String operator, List<Boolean> tests){
+                int totalFailed = frequency(tests, false);
+                int totalPassed = frequency(tests, true);
+
+                double failed = frequency(opsMap.get(operator), false);
+                double top = failed/totalFailed;
+
+                return 0;
+
+
         }
 
         static void run() {
@@ -41,10 +74,16 @@ public class PatchingLab {
                 // Tests are loaded from resources/rers2020_test_cases. If you are you are using
                 // your own tests, make sure you put them in the same folder with the same
                 // naming convention.
-                OperatorTracker.runAllTests();
-                System.out.println("Entered run");
 
-                // Loop here, running your genetic algorithm until you think it is done
+                System.out.println("Entered run");
+                List<Boolean> tests = OperatorTracker.runAllTests();
+
+                double fitnessVal = getFitness(tests);
+                System.out.println("Fitness Value = " + fitnessVal);
+
+
+
+
                 while (!isFinished) {
                         // Do things!
                         try {
