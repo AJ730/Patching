@@ -27,7 +27,6 @@ target/
 
 
 # Lab specific
-instrumented/
 instrumented_fuzzing/
 instrumented_symbolic/
 RERS/

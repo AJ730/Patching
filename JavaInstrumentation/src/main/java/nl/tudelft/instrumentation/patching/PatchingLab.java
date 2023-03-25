@@ -1,9 +1,10 @@
 package nl.tudelft.instrumentation.patching;
-
+import com.google.common.collect.Lists;
 import org.checkerframework.checker.units.qual.A;
-
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Collections.frequency;
 
@@ -11,13 +12,17 @@ public class PatchingLab {
 
     static Random r = new Random();
     static boolean isFinished = false;
-
     static HashMap<String, HashSet<Integer>> opsMap;
-
+    static HashMap<Integer, String[]> population;
+    static HashMap<Double, String[]> topSelection;
+    static HashMap<Integer, String[]> crossover;
 
     static void initialize() {
         // initialize the population based on OperatorTracker.operators
         opsMap = new HashMap<>();
+        population = new HashMap<>();
+        topSelection = new HashMap<>();
+        crossover = new HashMap<>();
     }
 
     // encounteredOperator gets called for each operator encountered while running tests
@@ -67,6 +72,32 @@ public class PatchingLab {
         return top + passed / totalPassed;
     }
 
+    static void generatePopulation(int size) {
+        for (int i = 0; i<size; i++){
+            String[] operatorList = new String[OperatorTracker.operators.length];
+            for (int j=0; j<operatorList.length; j++){
+                operatorList[j] = OperatorTracker.operators[r.nextInt(OperatorTracker.operators.length)];
+            }
+            population.put(i, operatorList);
+        }
+    }
+
+    static void populationSelection(int sizeLim) {
+        for (int i = 0; i<population.size(); i++){
+            OperatorTracker.operators = population.get(i);
+            List<Boolean> selection = OperatorTracker.runAllTests();
+            double fitnessValSelection = getFitness(selection);
+            topSelection.put(fitnessValSelection, population.get(i));
+        }
+        List<Double> l = new ArrayList<Double>(topSelection.keySet());
+        Collections.sort(l);
+        int limiter = topSelection.size()-sizeLim;
+        for (int j= 0; j< limiter; j++){
+            topSelection.remove(l.get(j));
+        }
+    }
+
+
     static void run() {
         initialize();
 
@@ -80,17 +111,15 @@ public class PatchingLab {
         List<Boolean> tests = OperatorTracker.runAllTests();
 
         double fitnessVal = getFitness(tests);
-        System.out.println("Fitness Value = " + fitnessVal);
-
-
+        System.out.println("Initial Fitness Value = " + fitnessVal);
         while (!isFinished) {
             // Do things!
-            try {
-                System.out.println("Woohoo, looping!");
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            // !!!!!!Set population size here!!!!!!
+            generatePopulation(20);
+            System.out.println("Population: "+population);
+            populationSelection(3);
+            System.out.println("Selection: "+topSelection);
+            break;
         }
     }
 
