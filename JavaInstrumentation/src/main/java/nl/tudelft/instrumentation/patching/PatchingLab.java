@@ -14,10 +14,10 @@ public class PatchingLab {
     static boolean isFinished = false;
     static HashMap<String, HashSet<Integer>> opsMap;
     static HashMap<Integer, String[]> population;
-    static HashMap<Double, String[]> topSelection;
+    static HashMap<String[], Double> topSelection;
     static ArrayList<String[]> crossover;
     static ArrayList<String[]> mutated;
-    static HashMap<Double, String[]> mutationScores;
+    static HashMap<String[], Double> mutationScores;
     static String[] bestResult;
     static final String[] opsString = new String[]{"==", "!=", "<=", "<", ">", ">="};
 
@@ -89,29 +89,38 @@ public class PatchingLab {
     }
 
     static void populationSelection(int sizeLim) {
-        for (int i = 0; i<population.size(); i++){
+        for (int i = 0; i < population.size(); i++) {
             OperatorTracker.operators = population.get(i);
             List<Boolean> selection = OperatorTracker.runAllTests();
             double fitnessValSelection = getFitness(selection);
-            topSelection.put(fitnessValSelection, population.get(i));
+            topSelection.put(population.get(i), fitnessValSelection);
         }
-        List<Double> l = new ArrayList<>(topSelection.keySet());
-        Collections.sort(l);
-        int limiter = topSelection.size()-sizeLim;
-        for (int j= 0; j< limiter; j++){
-            topSelection.remove(l.get(j));
+        int limiter = topSelection.size() - sizeLim;
+
+        for (int j = 0; j < limiter; j++) {
+            double min = Collections.min(topSelection.values());
+            ArrayList<String[]> funnyCode = new ArrayList<>();
+            for (String[] entry : topSelection.keySet()) {
+                if (topSelection.get(entry).equals(min)) {
+                    funnyCode.add(entry);
+                    break;
+                }
+            }
+            for (String[] haha : funnyCode) {
+                topSelection.remove(haha);
+            }
         }
     }
 
     static void populationCrossover() {
         int cutoff = r.nextInt(OperatorTracker.operators.length);
-        List<Double> l = new ArrayList<>(topSelection.keySet());
+        List<String[]> l = new ArrayList<>(topSelection.keySet());
         int limiter = topSelection.size()-1;
         for (int i = 0; i<limiter; i++) {
             for (int j =1; j<=limiter; j++) {
                 if (i!=j) {
-                    List<String> parent1 = Arrays.asList(topSelection.get(l.get(i)));
-                    List<String> parent2 = Arrays.asList(topSelection.get(l.get(j)));
+                    List<String> parent1 = Arrays.asList(l.get(i));
+                    List<String> parent2 = Arrays.asList(l.get(j));
                     ArrayList<String> sub1 = new ArrayList<>();
                     sub1.addAll(parent1.subList(0, cutoff));
                     sub1.addAll(parent2.subList(cutoff, parent2.size()));
@@ -154,12 +163,16 @@ public class PatchingLab {
             String[] brokencode = ops.toArray(new String[0]);
             OperatorTracker.operators = brokencode;
             List<Boolean> fitnessOfMutated = OperatorTracker.runAllTests();
-            mutationScores.put(getFitness(fitnessOfMutated), brokencode);
+            mutationScores.put(brokencode, getFitness(fitnessOfMutated));
         }
         // Dumb method to add the highest fitness scoring result to the bestresult
-        List<Double> l = new ArrayList<>(mutationScores.keySet());
-        Collections.sort(l);
-        bestResult = mutationScores.get(l.get(l.size()-1));
+        double max = Collections.min(mutationScores.values());
+        for (String[] entry : topSelection.keySet()) {
+            if (topSelection.get(entry).equals(max)) {
+                bestResult = entry;
+            }
+        }
+        crossover.clear();
     }
 
     static void run() {
@@ -190,7 +203,6 @@ public class PatchingLab {
             OperatorTracker.operators = bestResult;
             double fitnessVal1 = getFitness(OperatorTracker.runAllTests());
             System.out.println("New Fitness Value after a run = " + fitnessVal1);
-            break;
         }
     }
 
@@ -200,4 +212,6 @@ public class PatchingLab {
 
         // System.out.println(out);
     }
+
+    // Custom methods
 }
