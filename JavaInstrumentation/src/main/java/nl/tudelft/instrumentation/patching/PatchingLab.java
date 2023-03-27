@@ -79,7 +79,9 @@ public class PatchingLab {
     }
 
     static void generatePopulation(int size) {
-        for (int i = 0; i<size; i++){
+        population.put(0, OperatorTracker.operators);
+        int lim = size-1;
+        for (int i = 0; i<lim; i++){
             String[] operatorList = new String[OperatorTracker.operators.length];
             for (int j=0; j<operatorList.length; j++){
                 operatorList[j] = OperatorTracker.operators[r.nextInt(OperatorTracker.operators.length)];
@@ -172,7 +174,6 @@ public class PatchingLab {
                 bestResult = entry;
             }
         }
-        crossover.clear();
     }
 
     static void run() {
@@ -203,6 +204,8 @@ public class PatchingLab {
             OperatorTracker.operators = bestResult;
             double fitnessVal1 = getFitness(OperatorTracker.runAllTests());
             System.out.println("New Fitness Value after a run = " + fitnessVal1);
+            crossover.clear();
+            mutationScores.clear();
         }
     }
 
