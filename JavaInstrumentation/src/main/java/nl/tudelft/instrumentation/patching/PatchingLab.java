@@ -18,6 +18,8 @@ public class PatchingLab {
     static String[] overallBestResult;
     static final String[] opsString = new String[]{"==", "!=", "<=", "<", ">", ">="};
 
+    static final double epsilon = 0.000001;
+
     static void initialize() {
         // initialize the population based on OperatorTracker.operators
         opsMap = new HashMap<>();
@@ -64,15 +66,20 @@ public class PatchingLab {
     }
 
     static double tarantulaScore(String operator, List<Boolean> tests) {
-        int totalFailed = frequency(tests, false);
-        int totalPassed = frequency(tests, true);
+        double amountTrue = 0;
+        double amountFalse = 0;
 
-        double failed = frequency(opsMap.get(operator), false);
-        double top = failed / totalFailed;
+        for (Integer k : opsMap.get(operator)) {
+            if (tests.get(k)) {
+                amountTrue++;
+            } else amountFalse++;
+        }
 
-        double passed = frequency(opsMap.get(operator), true);
+        double falseScore = (amountFalse / (double) Collections.frequency(tests, false) + epsilon);
+        double trueScore = (amountTrue / (double) Collections.frequency(tests, true) + epsilon);
+        double score = (falseScore) / (falseScore + trueScore);
+        return score;
 
-        return top + passed / totalPassed;
     }
 
     static void generatePopulation(int size) {
@@ -95,9 +102,11 @@ public class PatchingLab {
         }
         int limiter = topSelection.size() - sizeLim;
 
+
         for (int j = 0; j < limiter; j++) {
             double min = Collections.min(topSelection.values());
             ArrayList<String[]> funnyCode = new ArrayList<>();
+
             for (String[] entry : topSelection.keySet()) {
                 if (topSelection.get(entry).equals(min)) {
                     funnyCode.add(entry);
