@@ -80,8 +80,7 @@ public class PatchingLab {
 
     static void generatePopulation(int size) {
         population.put(0, OperatorTracker.operators);
-        int lim = size-1;
-        for (int i = 0; i<lim; i++){
+        for (int i = 1; i<size; i++){
             String[] operatorList = new String[OperatorTracker.operators.length];
             for (int j=0; j<operatorList.length; j++){
                 operatorList[j] = OperatorTracker.operators[r.nextInt(OperatorTracker.operators.length)];
