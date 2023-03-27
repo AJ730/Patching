@@ -165,7 +165,7 @@ public class PatchingLab {
             mutationScores.put(brokencode, getFitness(fitnessOfMutated));
         }
         // Dumb method to add the highest fitness scoring result to the bestresult
-        double max = Collections.min(mutationScores.values());
+        double max = Collections.max(mutationScores.values());
         for (String[] entry : topSelection.keySet()) {
             if (topSelection.get(entry).equals(max)) {
                 bestResult = entry;
