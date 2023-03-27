@@ -1,10 +1,6 @@
 package nl.tudelft.instrumentation.patching;
-import com.google.common.collect.Lists;
-import org.checkerframework.checker.units.qual.A;
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+
 
 import static java.util.Collections.frequency;
 
@@ -136,6 +132,7 @@ public class PatchingLab {
                 }
             }
         }
+        crossover.add(overallBestResult);
     }
 
     static void populationMutation(double treshold) {
@@ -210,9 +207,13 @@ public class PatchingLab {
                 System.out.println("Fitness Value has not improved over original = " + fitnessVal);
             }
             else{
-            System.out.println("New Fitness Value after a run = " + fitnessVal1);}
+                overallBestResult = bestResult;
+                fitnessVal = fitnessVal1;
+                System.out.println("New Fitness Value after a run = " + fitnessVal1);
+            }
             crossover.clear();
             mutationScores.clear();
+            System.out.println("");
         }
     }
 
