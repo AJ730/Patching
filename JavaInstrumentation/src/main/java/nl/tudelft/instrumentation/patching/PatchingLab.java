@@ -201,7 +201,7 @@ public class PatchingLab {
             System.out.println("Result of Mutation" + mutationScores);
             OperatorTracker.operators = bestResult;
             double fitnessVal1 = getFitness(OperatorTracker.runAllTests());
-            if ( fitnessVal > fitnessVal1){
+            if ( fitnessVal >= fitnessVal1){
                 bestResult = overallBestResult;
                 OperatorTracker.operators = bestResult;
                 System.out.println("Fitness Value has not improved over original = " + fitnessVal);
