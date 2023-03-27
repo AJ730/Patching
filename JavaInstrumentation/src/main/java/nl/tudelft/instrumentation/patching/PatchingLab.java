@@ -19,6 +19,7 @@ public class PatchingLab {
     static ArrayList<String[]> mutated;
     static HashMap<String[], Double> mutationScores;
     static String[] bestResult;
+    static String[] overallBestResult;
     static final String[] opsString = new String[]{"==", "!=", "<=", "<", ">", ">="};
 
     static void initialize() {
@@ -189,6 +190,7 @@ public class PatchingLab {
 
         double fitnessVal = getFitness(tests);
         System.out.println("Initial Fitness Value = " + fitnessVal);
+        overallBestResult = OperatorTracker.operators;
         while (!isFinished) {
             // Do things!
             // !!!!!!Set population size here!!!!!!
@@ -202,7 +204,13 @@ public class PatchingLab {
             System.out.println("Result of Mutation" + mutationScores);
             OperatorTracker.operators = bestResult;
             double fitnessVal1 = getFitness(OperatorTracker.runAllTests());
-            System.out.println("New Fitness Value after a run = " + fitnessVal1);
+            if ( fitnessVal > fitnessVal1){
+                bestResult = overallBestResult;
+                OperatorTracker.operators = bestResult;
+                System.out.println("Fitness Value has not improved over original = " + fitnessVal);
+            }
+            else{
+            System.out.println("New Fitness Value after a run = " + fitnessVal1);}
             crossover.clear();
             mutationScores.clear();
         }
