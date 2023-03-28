@@ -43,7 +43,7 @@ public class PatchingLab {
         // naming convention.
         System.out.println(OperatorTracker.runAllTests());
         System.out.println("Entered run");
-
+        System.out.println("Best: "+ Arrays.toString(OperatorTracker.operators));
         // Loop here, running your genetic algorithm until you think it is done
         while (!isFinished) {
             // Do things!
