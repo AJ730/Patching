@@ -17,7 +17,7 @@ public class PatchingLab {
     static String[] bestResult;
     static String[] overallBestResult;
     static final String[] opsString = new String[]{"==", "!=", "<=", "<", ">", ">="};
-
+    static HashMap<Integer, Double> timeMap;
     static final double epsilon = 0.000001;
 
     static void initialize() {
@@ -28,6 +28,7 @@ public class PatchingLab {
         crossover = new ArrayList<>();
         mutated = new ArrayList<>();
         mutationScores = new HashMap<>();
+        timeMap = new HashMap<>();
     }
 
     // encounteredOperator gets called for each operator encountered while running tests
@@ -184,44 +185,40 @@ public class PatchingLab {
 
     static void run() {
         initialize();
-
-        // Place the code here you want to run once:
-        // You want to change this of course, this is just an example
-        // Tests are loaded from resources/rers2020_test_cases. If you are you are using
-        // your own tests, make sure you put them in the same folder with the same
-        // naming convention.
-
         System.out.println("Entered run");
         List<Boolean> tests = OperatorTracker.runAllTests();
 
         double fitnessVal = getFitness(tests);
         System.out.println("Initial Fitness Value = " + fitnessVal);
         overallBestResult = OperatorTracker.operators;
+        int iteration = 1;
         while (!isFinished) {
-            // Do things!
-            // !!!!!!Set population size here!!!!!!
             generatePopulation(20);
-            System.out.println("Population: "+population);
+            //System.out.println("Population: "+population);
             populationSelection(3);
-            System.out.println("Selection: "+topSelection);
+            //System.out.println("Selection: "+topSelection);
             populationCrossover();
-            System.out.println("Crossover: "+ crossover);
+            //System.out.println("Crossover: "+ crossover);
             populationMutation(0.50);
-            System.out.println("Result of Mutation" + mutationScores);
+            //System.out.println("Result of Mutation" + mutationScores);
             OperatorTracker.operators = bestResult;
             double fitnessVal1 = getFitness(OperatorTracker.runAllTests());
             if ( fitnessVal >= fitnessVal1){
                 bestResult = overallBestResult;
                 OperatorTracker.operators = bestResult;
-                System.out.println("Fitness Value has not improved over original = " + fitnessVal);
+                System.out.println("Fitness Value has not improved = " + fitnessVal);
+                timeMap.put(iteration++, fitnessVal);
             }
             else{
                 overallBestResult = bestResult;
                 fitnessVal = fitnessVal1;
-                System.out.println("New Fitness Value after a run = " + fitnessVal1);
+                System.out.println("Fitness Value has improved = " + fitnessVal1);
+                timeMap.put(iteration++, fitnessVal1);
             }
             crossover.clear();
             mutationScores.clear();
+            System.out.println("Best: "+Arrays.toString(overallBestResult));
+            System.out.println("Time map: "+ timeMap.values());
             System.out.println("");
         }
     }
